@@ -52,6 +52,25 @@ class Shortly(object):
 		self.redis.set('reverse-url:' + url, short_id)
 		return short_id
 
+	def on_follow_short_link(self, request, short_id):
+		link_target = self.redis.get('url-target:' + short_id)
+		if link_target is None:
+			raise NotFound()
+		self.redis.incr('click-count:' + short_id)
+		return redirect(link_target)
+
+
+	def on_short_link_details(self, request, short_id):
+		link_target = self.redis.get('url-target:' + short_id)
+		if link_target is None:
+			raise NotFound()
+		click_count = self.redis.get('click-count:' + short_id or 0)
+		return self.render_template('short_link_details.html',
+									link_target=link_target,
+									short_id=short_id, 
+									click_count=click_count)
+
+
 	def base36_encode(number):
 		assert number >= 0, 'positive integer required'
 		if number == 0:
@@ -61,6 +80,7 @@ class Shortly(object):
 			number , i = divmod(number, 30)
 			base36.append('0123456789abcdefghijklmnopqrstuvwxyz'[i])
 		return ''.join(reversed(base36))
+
 
 	def dispatch_request(self, request):
 		adapter = self.url_map.bind_to_environ(request.environ)
