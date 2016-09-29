@@ -28,9 +28,9 @@ def create_app(redis_host='localhost', redis_port=6379, with_static=True):
 					'redis_port': redis_port})
 
 	if with_static:
-		app.wsgi_app = SharedDataMiddleware(app.wsgi_app, 
+		app.wsgi_app = SharedDataMiddleware	(app.wsgi_app, 
 			{
-				'/static': os.path.join(os.path.direname(__file__), 'static')
+				'/static': os.path.join(os.path.dirname(__file__), 'static')
 			})
 	return app
 
