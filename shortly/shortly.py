@@ -31,7 +31,7 @@ class Shortly(object):
 		adapter = self.url_map.bind_to_environ(request.environ)
 		try:
 			endpoint, values = adapter.match()
-			return gettattr(self, 'on_%s' % endpoint)(request, **values)
+			return getattr(self, 'on_%s' % endpoint)(request, **values)
 		except HTTPException, e:
 			return e
 
